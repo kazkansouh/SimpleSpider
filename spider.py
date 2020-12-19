@@ -15,16 +15,15 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-
-
-## Simple Spider. Designed for lightweight spidering of small sites to
+## Name: Simple Spider.
+##
+## Description: Designed for lightweight spidering of small sites to
 ## gain initial visibility.
 ##
 ## TODO:
 ## * save output as json
 ## * allow for mutators to be dependent upon processing another page
 ## ** e.g. only apply mutators if parent has been requested and is not an index
-## * identify baseline of packages and create setup.py
 
 import urllib.request
 from urllib.error import URLError
