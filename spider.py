@@ -126,12 +126,15 @@ class Result:
     ):
         self.url                   = url
         self.status_code           = status_code
-        self.length_header         = int(length or 0)
+        self.content_length        = length
         self.content_type          = (content_type or '').lower().split(';')[0]
         self.detected_content_type = detected_content_type.split(';')[0]
         self.linked_resources      = []
         self.custom_error          = None
         self.tags                  = set()
+
+        if type(self.content_length) == str:
+            self.content_length = int(self.content_length)
 
         if (detected_cts := libmagic_override.get(self.content_type, [])):
             if self.detected_content_type in detected_cts:
@@ -310,8 +313,22 @@ def _load_url(url, timeout=30):
         #     if res.content_type not in recurse_types:
         #         return res
 
+        content = chunk1 + resp.read()
         logging.debug(f'recurse condition for {url} with {res.content_type}')
-        soup = BeautifulSoup(chunk1 + resp.read(), "html.parser")
+        soup = BeautifulSoup(content, "html.parser")
+
+        if not res.content_length:
+            if (
+                type(res.content_length) == int and
+                res.content_length != len(content)
+            ):
+                res.tags.add('bad-length')
+                logging.warning(
+                    f'inconsistent content-length detected for {url},'
+                    f' header reports size as {res.content_length} '
+                    f'but actual size received is {len(content)}'
+                )
+            res.content_length = len(content)
 
         if is_index(soup):
             res.tags.add('index')
@@ -1081,12 +1098,13 @@ def main():
         if args.hide_media and track.is_media():
             continue
         resp = track.response
-        sc = -99
-        l = 0
+        sc = 0
+        l = '?'
         ct = ''
         if not track.is_pending():
             sc = resp.status_code
-            l = resp.length_header
+            if (l := resp.content_length) == None:
+                l = '???'
             ct = resp.content_type
         col = ''
         if sc >= 200:
@@ -1097,10 +1115,12 @@ def main():
             col = Fore.RED + Style.BRIGHT
         if sc >= 500:
             col = Fore.BLUE + Style.BRIGHT
+        if not sc:
+            sc = '???'
         print(
             '  '
-            f'[{col}{sc:03d}{Style.RESET_ALL}] '
-            f'[{l:·>8d}] '
+            f'[{col}{sc:0>3}{Style.RESET_ALL}] '
+            f'[{l:·>8}] '
             f'[{ct:·<{ct_width}}] '
             f'{Fore.YELLOW}{"F" if track.guess else " "}{Style.RESET_ALL} '
             f'{k}', end=''
