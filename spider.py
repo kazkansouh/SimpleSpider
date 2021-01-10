@@ -298,7 +298,12 @@ def _load_url(url, timeout=30):
         # out as its likely that the html parser will fail. n.b. this
         # covers case of empty body.
         if res.detected_content_type not in recurse_types:
-            return res
+            if (
+                    not res.content_type or
+                    res.detected_content_type.split('/')[0] != 'text' or
+                    res.content_type not in recurse_types
+            ):
+                return res
 
         # for now, ignore reported content type
         # if res.content_type:
