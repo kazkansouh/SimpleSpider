@@ -35,6 +35,7 @@ import magic
 import re
 import socket
 import http.client
+import http.cookies
 import argparse
 import posixpath
 import logging
@@ -294,8 +295,13 @@ def _load_url(url, timeout=30):
         if (redir := resp.getheader('Location')):
             res.add_resource('redirect', redir)
 
-        if resp.getheader('Set-Cookie'):
+        if (cookies := resp.info().get_all('Set-Cookie')):
             res.tags.add('cookie')
+            for cookie in cookies:
+                logging.info(f'found cookie {cookie} on {url}')
+                for c in (sc := http.cookies.SimpleCookie(cookie)):
+                    if sc[c]['path']:
+                        res.add_resource('cookie', sc[c]['path'])
 
         # if detected content type is not valid for recursion, bomb
         # out as its likely that the html parser will fail. n.b. this
