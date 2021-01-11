@@ -50,7 +50,7 @@ import itertools
 
 inscope_urls = {}
 outscope_urls = {}
-exclude_urls = set()
+exclude_urls = {}
 base_url = None
 
 default_headers = {
@@ -600,7 +600,7 @@ def deferred_mut_autoexclude(track, parent_track):
                 f'Autoexclude: {dir_url} accepts all, removing from scope. '
                 f'Consider using a filter to tune detection.'
             )
-            exclude_urls.add(dir_url)
+            exclude_urls[dir_url] = True
     return []
 
 def mut_autoexclude(track):
@@ -813,7 +813,7 @@ def main():
 
     for path in args.exclude_paths:
         if is_url_prefix(base_url, (url := url_normalise(path, base_url))):
-            exclude_urls.add(url.geturl())
+            exclude_urls[url.geturl()] = False
         else:
             logging.warning(f'out of scope exclude path {url.geturl()}')
 
@@ -1174,8 +1174,14 @@ def main():
 
     if args.show_external and outscope_urls:
         print('[*] URLs out of scope:')
-        for k in outscope_urls:
-            print(f'  {k}', end='')
+        for k in sorted(set(outscope_urls).difference(inscope_urls)):
+            auto = ''
+            for u in exclude_urls:
+                if is_url_prefix(u, k, same_ok=True):
+                    if exclude_urls[u]:
+                        auto = f'{Fore.YELLOW}A{Style.RESET_ALL}'
+                        break
+            print(f'  {auto: <1} {k}', end='')
             if outscope_urls[k].form:
                 for f in outscope_urls[k].form:
                     print(format_form(*f), end='')
