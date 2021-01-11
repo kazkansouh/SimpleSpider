@@ -563,7 +563,7 @@ def mut_commonfiles(track):
     if 'commonfiles' in args.mutator_wordlist:
         words = args.mutator_wordlist['commonfiles']
     else:
-        logging.warning('commonfiles mutator enabled without wordlist')
+        logging.info('commonfiles mutator enabled without wordlist')
         words = basic_wordlist
     for bps in boring_path_segments:
         if bps in track.response.url.lower():
