@@ -28,6 +28,7 @@ setup(
     install_requires=[
         'colorama>=0.4.3',
         'filemagic>=1.6',
-        'beautifulsoup4>=4.9.1
+        'beautifulsoup4>=4.9.1',
+        'html5lib>=1.0.1'
     ]
 )

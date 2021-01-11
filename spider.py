@@ -315,7 +315,7 @@ def _load_url(url, timeout=30):
 
         content = chunk1 + resp.read()
         logging.debug(f'recurse condition for {url} with {res.content_type}')
-        soup = BeautifulSoup(content, "html.parser")
+        soup = BeautifulSoup(content, "html5lib")
 
         if not res.content_length:
             if (
