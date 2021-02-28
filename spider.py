@@ -114,6 +114,7 @@ libmagic_override = {
         'text/html'   # rare cases libmagic will detect as html
     ],
     'text/css': ['text/plain'],
+    'application/xml': ['text/html'],
     '': ['application/x-empty']
 }
 
