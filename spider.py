@@ -305,6 +305,22 @@ def _load_url(url, timeout=30):
                     if sc[c]['path']:
                         res.add_resource('cookie', sc[c]['path'])
 
+        if res.detected_content_type == 'application/javascript':
+            content = chunk1 + resp.read()
+            for mapping in re.finditer(
+                    b'(?m:^//[#@] sourceMappingURL=(.*)$)',
+                    content
+            ):
+                if (
+                        not mapping[1].startswith(b'data:') and
+                        not mapping[1].startswith(b'blob:')
+                ):
+                    res.tags.add('sourcemap')
+                    res.add_resource('map', mapping[1].decode('utf8'))
+                else:
+                    res.tags.add('sourcemap-embedded')
+            return res
+
         # if detected content type is not valid for recursion, bomb
         # out as its likely that the html parser will fail. n.b. this
         # covers case of empty body.
