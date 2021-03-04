@@ -24,6 +24,7 @@
 ## * save output as json
 ## * allow for mutators to be dependent upon processing another page
 ## ** e.g. only apply mutators if parent has been requested and is not an index
+## * use urllib.robotparser to extract urls from robots.txt
 
 import urllib.request
 from urllib.error import URLError
