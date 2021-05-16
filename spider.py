@@ -501,7 +501,7 @@ extensions = [
     '~', '.save', '.sav', '.bak', '.tar.gz', '.gz', '.7z', '.cab',
     '.tgz', '.gzip', '.bzip2', '.inc', '.zip', '.rar', '.jar',
     '.java', '.class', '.properties', '.bak', '.bak1', '.bkp',
-    '.back', '.backup', '.backup1', '.old', '.old1', '.$$$'
+    '.back', '.backup', '.backup1', '.old', '.old1', '.$$$', '.map'
 ]
 base_words = [
     'index', 'config', 'home', 'login', 'readme', 'README', 'robots'
@@ -791,7 +791,7 @@ def main():
             , mut_commonfiles
         ],
         help='Fuzzers to apply, (default: {}). available: {}'.format(
-            'subdirs, relatedfiles',
+            'autoexclude, subdirs, relatedfiles, commonfiles',
             ', '.join([
                 f'{f.__name__[4:]} ({f.__doc__})' for f in all_mutators
             ])
